@@ -18,6 +18,7 @@ Commands:
 Shows the Docker version information.
 
 Cmd - `sudo docker version`
+
 Documentation - https://docs.docker.com/engine/reference/commandline/version/
 
 <details>
@@ -49,6 +50,7 @@ Server:
 Lists images. Includes information about the repository, tag and image ID.
 
 Cmd - `sudo docker images`
+
 Documentation - https://docs.docker.com/engine/reference/commandline/images/
 <details>
 <summary>Example</summary>
@@ -69,6 +71,7 @@ It creates a writeable container layer over the specified image, and then starts
 That is, docker run is equivalent to the API `/containers/create` then `/containers/(id)/start`.
 
 Cmd - `sudo docker run [options] [image] [command] [args]`
+
 Documentation - https://docs.docker.com/engine/reference/commandline/run/
 
 <details>
@@ -240,6 +243,7 @@ Lists containers. `-a` flag lists all containers, including ones that are stoppe
 It shows the short ID for containers.
 
 Cmd - `sudo docker ps [OPTIONS]`
+
 Documentation - https://docs.docker.com/engine/reference/commandline/ps/
 
 <details>
@@ -266,6 +270,7 @@ Creates a new image from a container's changes. Repository name should be based 
 If no tag is specified, docker uses the default tag which is `latest`.
 
 Cmd - `docker commit [OPTIONS] [CONTAINER ID/NAME] [REPOSITORY[:TAG]]`
+
 Documentation - https://docs.docker.com/engine/reference/commandline/commit/
 
 <details>
@@ -550,6 +555,7 @@ Also, the build context is where docker looks for the `Dockerfile`. A different 
 Usually `-t` flag is used to tag the build.
 
 Cmd - `docker build [OPTIONS] PATH | URL | -`
+
 Documentation - https://docs.docker.com/engine/reference/commandline/build/
 
 <details>
@@ -836,6 +842,7 @@ centos              7                   67591570dd29        2 months ago        
 Starts one or more stopped containers
 
 Cmd - `docker start [OPTIONS] CONTAINER [CONTAINER...]`
+
 Documentation - https://docs.docker.com/engine/reference/commandline/start/
 
 <details>
@@ -859,6 +866,7 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 Stops one or more running containers
 
 Cmd - `docker stop [OPTIONS] CONTAINER [CONTAINER...]`
+
 Documentation - https://docs.docker.com/engine/reference/commandline/stop/
 
 <details>
@@ -899,6 +907,7 @@ to a docker container running a process other than bash.
 Exiting from the terminal will not terminate the container.
 
 Cmd - `docker exec [OPTIONS] CONTAINER COMMAND [ARG...]`
+
 Documentation - https://docs.docker.com/engine/reference/commandline/exec/
 
 <details>
@@ -935,6 +944,7 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
 Removes one or more containers using container ID or name. Can only delete containers that have been stopped.
 
 Cmd - `docker rm [OPTIONS] CONTAINER [CONTAINER...]`
+
 Documentation - https://docs.docker.com/engine/reference/commandline/rm/
 
 <details>
@@ -960,6 +970,7 @@ CONTAINER ID        IMAGE                     COMMAND                  CREATED  
 Removes one or more images. If an image is tagged multiple times, remove each tag.
 
 Cmd - `docker rmi [OPTIONS] IMAGE [IMAGE...]`
+
 Documentation - https://docs.docker.com/engine/reference/commandline/rmi/
 
 <details>
@@ -1008,6 +1019,7 @@ Pushes an image or a repository to a registry.
 Local repo must have same name and tag as the Docker Hub repo.
 
 Cmd - `docker push [OPTIONS] NAME[:TAG]`
+
 Documentation - https://docs.docker.com/engine/reference/commandline/push/
 
 <details>
@@ -1049,6 +1061,7 @@ The push refers to a repository [docker.io/sudosuhas/entryping]
 Create a tag `TARGET_IMAGE` that refers to `SOURCE_IMAGE`
 
 Cmd - `docker tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]`
+
 Documentation - https://docs.docker.com/engine/reference/commandline/tag/
 
 <details>
@@ -1069,21 +1082,6 @@ centos                7                   67591570dd29        2 months ago      
 $ sudo docker tag f29b04202a45 sudosuhas/myubuntuimg:1.0
 
 $ sudo docker tag sudosuhas/myimg:1.0 sudosuhas/myubuntuimg:1.0
-```
-
-</details>
-
-### Docker
-
-
-Cmd - ``
-Documentation -
-
-<details>
-<summary>Example</summary>
-
-```bash
-
 ```
 
 </details>
