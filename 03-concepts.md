@@ -53,3 +53,12 @@ A registry can have multiple repositories.
   - Docker Machine - provision Docker hosts and install Docker engine on them
   - Docker Swarm - cluster many engines and schedule containers
   - Docker Compose - create and manage multi-container applications
+
+### Volumes
+A volume is a designated directory in a container, which is designed to persist data,
+independent of the container's life cycle
+  - Volume changes are excluded when updating an image
+  - Persist when a container is deleted
+  - Can be mapped to a host folder
+  - Can be shaed between containers
+

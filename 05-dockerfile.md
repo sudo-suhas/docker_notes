@@ -23,6 +23,14 @@ A Dockerfile is a configuration file that contains instructions for building a D
     + Shell and EXEC form but EXEC form preferred as shell form cannot accept arguments at runtime
     + Container essentially runs as an executable
     + Cannot be overridden at runtime
+  - VOLUME
+    + Volume instruction creates a mount point
+    + Can specify arguments JSON array or string
+    + Cannot map volumes to host directories
+    + Volumes are initialized when the container is executed
+  - EXPOSE
+    + Configures which ports a container will listen on at runtime
+    + Ports still need to be mapped when container is executed
 
 Example Dockerfile -
 
@@ -38,6 +46,16 @@ CMD ping 127.0.0.1 -c 30
 CMD ["ping", "127.0.0.1", "-c", "30"]
 
 ENTRYPOINT ["ping"]
+
+VOLUME /myvol
+
+# String, multiple
+VOLUME /www/website1.com /www/website2.com
+
+# JSON example
+VOLUME ["myvol", "myvol2"]
+
+EXPOSE 80 443
 ```
 
 
@@ -222,6 +240,21 @@ PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.
 --- 127.0.0.1 ping statistics ---
 5 packets transmitted, 5 received, 0% packet loss, time 3999ms
 rtt min/avg/max/mdev = 0.027/0.034/0.039/0.004 ms
+```
+
+</details>
+
+<details>
+<summary>EXPOSE example</summary>
+
+```Dockerfile
+FROM ubuntu:16.04
+RUN apt-get update && \
+  apt-get install -y nginx
+
+EXPOSE 80 443
+
+CMD ["nginx", "-g", "daemon off;"]
 ```
 
 </details>

@@ -6,6 +6,9 @@ Docker setup and notes for Linux.
   - [Docker Concepts](03-concepts.md)
   - [Docker CLI Commands](04-docker-cmds.md)
   - [Dockerfile](05-dockerfile.md)
+  - [Debug](06-debug.md)
+  - [Security](07-security.md)
+  - [Private Registry](08-private-registry.md)
 
 ## Benefits
   - Separation of concerns
@@ -21,3 +24,7 @@ Video tutorials -
   - Introduction to Docker - https://training.docker.com/introduction-to-docker
   - Docker Fundamentals - https://training.docker.com/docker-fundamentals
   - Docker Operations - https://training.docker.com/docker-operations
+
+For managing data in containers, https://docs.docker.com/engine/tutorials/dockervolumes/
+Docker container networking, https://docs.docker.com/engine/userguide/networking/
+Configure and run docker - https://docs.docker.com/engine/admin/

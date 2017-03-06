@@ -13,12 +13,12 @@ Commands:
  - [`docker rmi`](#docker-rmi)
  - [`docker push`](#docker-push)
  - [`docker tag`](#docker-tag)
+ - [`docker inspect`](#docker-inspect)
 
 ### Docker version
 Shows the Docker version information.
 
-Cmd - `sudo docker version`
-
+Cmd - `sudo docker version` <br>
 Documentation - https://docs.docker.com/engine/reference/commandline/version/
 
 <details>
@@ -49,8 +49,7 @@ Server:
 ### Docker images
 Lists images. Includes information about the repository, tag and image ID.
 
-Cmd - `sudo docker images`
-
+Cmd - `sudo docker images` <br>
 Documentation - https://docs.docker.com/engine/reference/commandline/images/
 <details>
 <summary>Example</summary>
@@ -70,15 +69,14 @@ If no name is chosed when a container is run, Docker will automatically choose a
 It creates a writeable container layer over the specified image, and then starts it using the specified command.
 That is, docker run is equivalent to the API `/containers/create` then `/containers/(id)/start`.
 
-Cmd - `sudo docker run [options] [image] [command] [args]`
-
-Documentation - https://docs.docker.com/engine/reference/commandline/run/
+Cmd - `sudo docker run [options] [image] [command] [args]` <br>
+Documentation - https://docs.docker.com/engine/reference/commandline/run/, https://docs.docker.com/engine/reference/run/
 
 <details>
 <summary>Example</summary>
 
 ```bash
-$ sudo docker run hello-world
+$ sudo docker run --name test-docker hello-world
 
 Hello from Docker!
 This message shows that your installation appears to be working correctly.
@@ -221,7 +219,9 @@ rtt min/avg/max/mdev = 0.022/0.027/0.038/0.007 ms
 
 **Map container and host ports**
   - Run a web application inside a container
-  - The `-p` flag to map container ports to host ports
+  - Ports can be manually mapped or auto mapped
+  - The `-P` flag to map container ports to host ports automatically.
+    Host port numbers range from 49153 to 65525. Only wirjs for ports defined in the `EXPOSE` instruction
 
 <details>
 <summary>Example</summary>
@@ -234,6 +234,122 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
 acce37e17255        tomcat:7            "catalina.sh run"   18 seconds ago      Up 17 seconds       0.0.0.0:1024->8080/tcp   kickass_clarke
 d167e274da21        ubuntu:16.04        "bash"              41 minutes ago      Up 41 minutes                                trusting_clarke
 
+$ sudo docker run -d -p 8080:80 nginx
+7a42922a197fde7d1bdc8391052fcb08f20234a0f68fbe3e18287efe03e54d02
+
+$ sudo docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                           NAMES
+7a42922a197f        nginx               "nginx -g 'daemon ..."   About a minute ago   Up About a minute   443/tcp, 0.0.0.0:8082->80/tcp   confident_engelbart
+
+$ curl -v localhost:8082
+* Rebuilt URL to: localhost:8082/
+* Hostname was NOT found in DNS cache
+*   Trying 127.0.0.1...
+* Connected to localhost (127.0.0.1) port 8082 (#0)
+> GET / HTTP/1.1
+> User-Agent: curl/7.35.0
+> Host: localhost:8082
+> Accept: */*
+>
+< HTTP/1.1 200 OK
+* Server nginx/1.11.10 is not blacklisted
+< Server: nginx/1.11.10
+< Date: Mon, 06 Mar 2017 03:28:52 GMT
+< Content-Type: text/html
+< Content-Length: 612
+< Last-Modified: Tue, 14 Feb 2017 15:36:04 GMT
+< Connection: keep-alive
+< ETag: "58a323e4-264"
+< Accept-Ranges: bytes
+<
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+* Connection #0 to host localhost left intact
+```
+
+</details>
+
+**Container application logs**
+  - Typically, apps have a well defined log location
+  - Map a host folder to the applications's log folder in the container
+  - In this way, you can view the log generated in the container from your host folder
+  - The `-v` flag can be used to map a volume
+
+<details>
+<summary>Example</summary>
+
+Run a container using nginx image and mount a volume to map
+the /nginxlogs folder to the /var/log/nginx folder in the container
+
+```bash
+$ ls /container
+ls: cannot access /container: No such file or directory
+
+$ sudo docker run -d -P -v /container/logs/nginx:/var/log/nginx nginx
+4a1a9a9f4f509e68b7bb5591abb6af486fd20d252c8af62ed3480feb79e51450
+
+$ ls /container
+logs
+
+$ ls /container/logs/nginx/
+access.log  error.log
+
+$ sudo docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                                         NAMES
+4a1a9a9f4f50        nginx               "nginx -g 'daemon ..."   About a minute ago   Up About a minute   0.0.0.0:1025->80/tcp, 0.0.0.0:1024->443/tcp   peaceful_einstein
+
+$ curl localhost:1025
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+
+$ cat /container/logs/nginx/access.log
+172.17.0.1 - - [06/Mar/2017:05:15:52 +0000] "GET / HTTP/1.1" 200 612 "-" "curl/7.35.0" "-"
 ```
 
 </details>
@@ -242,8 +358,7 @@ d167e274da21        ubuntu:16.04        "bash"              41 minutes ago      
 Lists containers. `-a` flag lists all containers, including ones that are stopped.
 It shows the short ID for containers.
 
-Cmd - `sudo docker ps [OPTIONS]`
-
+Cmd - `sudo docker ps [OPTIONS]` <br>
 Documentation - https://docs.docker.com/engine/reference/commandline/ps/
 
 <details>
@@ -269,8 +384,7 @@ d167e274da21        ubuntu:16.04        "bash"                 27 minutes ago   
 Creates a new image from a container's changes. Repository name should be based on `${username}/${application}`.
 If no tag is specified, docker uses the default tag which is `latest`.
 
-Cmd - `docker commit [OPTIONS] [CONTAINER ID/NAME] [REPOSITORY[:TAG]]`
-
+Cmd - `docker commit [OPTIONS] [CONTAINER ID/NAME] [REPOSITORY[:TAG]]` <br>
 Documentation - https://docs.docker.com/engine/reference/commandline/commit/
 
 <details>
@@ -554,8 +668,7 @@ Docker client packs all the files in the build context into a tar and sends it t
 Also, the build context is where docker looks for the `Dockerfile`. A different path can be specified by using the `-f` option.
 Usually `-t` flag is used to tag the build.
 
-Cmd - `docker build [OPTIONS] PATH | URL | -`
-
+Cmd - `docker build [OPTIONS] PATH | URL | -` <br>
 Documentation - https://docs.docker.com/engine/reference/commandline/build/
 
 <details>
@@ -841,8 +954,7 @@ centos              7                   67591570dd29        2 months ago        
 ### Docker start
 Starts one or more stopped containers
 
-Cmd - `docker start [OPTIONS] CONTAINER [CONTAINER...]`
-
+Cmd - `docker start [OPTIONS] CONTAINER [CONTAINER...]` <br>
 Documentation - https://docs.docker.com/engine/reference/commandline/start/
 
 <details>
@@ -865,8 +977,7 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 ### Docker stop
 Stops one or more running containers
 
-Cmd - `docker stop [OPTIONS] CONTAINER [CONTAINER...]`
-
+Cmd - `docker stop [OPTIONS] CONTAINER [CONTAINER...]` <br>
 Documentation - https://docs.docker.com/engine/reference/commandline/stop/
 
 <details>
@@ -906,8 +1017,7 @@ Runs a command in a running container. Can be used to get terminal access
 to a docker container running a process other than bash.
 Exiting from the terminal will not terminate the container.
 
-Cmd - `docker exec [OPTIONS] CONTAINER COMMAND [ARG...]`
-
+Cmd - `docker exec [OPTIONS] CONTAINER COMMAND [ARG...]` <br>
 Documentation - https://docs.docker.com/engine/reference/commandline/exec/
 
 <details>
@@ -943,8 +1053,7 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
 ### Docker rm
 Removes one or more containers using container ID or name. Can only delete containers that have been stopped.
 
-Cmd - `docker rm [OPTIONS] CONTAINER [CONTAINER...]`
-
+Cmd - `docker rm [OPTIONS] CONTAINER [CONTAINER...]` <br>
 Documentation - https://docs.docker.com/engine/reference/commandline/rm/
 
 <details>
@@ -969,8 +1078,7 @@ CONTAINER ID        IMAGE                     COMMAND                  CREATED  
 ### Docker rmi
 Removes one or more images. If an image is tagged multiple times, remove each tag.
 
-Cmd - `docker rmi [OPTIONS] IMAGE [IMAGE...]`
-
+Cmd - `docker rmi [OPTIONS] IMAGE [IMAGE...]` <br>
 Documentation - https://docs.docker.com/engine/reference/commandline/rmi/
 
 <details>
@@ -1018,8 +1126,7 @@ centos                7                   67591570dd29        2 months ago      
 Pushes an image or a repository to a registry.
 Local repo must have same name and tag as the Docker Hub repo.
 
-Cmd - `docker push [OPTIONS] NAME[:TAG]`
-
+Cmd - `docker push [OPTIONS] NAME[:TAG]` <br>
 Documentation - https://docs.docker.com/engine/reference/commandline/push/
 
 <details>
@@ -1060,8 +1167,7 @@ The push refers to a repository [docker.io/sudosuhas/entryping]
 ### Docker tag
 Create a tag `TARGET_IMAGE` that refers to `SOURCE_IMAGE`
 
-Cmd - `docker tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]`
-
+Cmd - `docker tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]` <br>
 Documentation - https://docs.docker.com/engine/reference/commandline/tag/
 
 <details>
@@ -1082,6 +1188,236 @@ centos                7                   67591570dd29        2 months ago      
 $ sudo docker tag f29b04202a45 sudosuhas/myubuntuimg:1.0
 
 $ sudo docker tag sudosuhas/myimg:1.0 sudosuhas/myubuntuimg:1.0
+```
+
+</details>
+
+### Docker inspect
+Returns low-level information on Docker objects. Outputs details in JSON array.
+Use grep to find a specific property.
+
+Cmd - `docker inspect [OPTIONS] NAME|ID [NAME|ID...]` <br>
+Documentation - https://docs.docker.com/engine/reference/commandline/inspect/
+
+<details>
+<summary>Example</summary>
+
+```bash
+$ sudo docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                         NAMES
+4a1a9a9f4f50        nginx               "nginx -g 'daemon ..."   5 minutes ago       Up 5 minutes        0.0.0.0:1025->80/tcp, 0.0.0.0:1024->443/tcp   peaceful_einstein
+
+$ sudo docker inspect 4a1a9a9f4f50
+[
+    {
+        "Id": "4a1a9a9f4f509e68b7bb5591abb6af486fd20d252c8af62ed3480feb79e51450",
+        "Created": "2017-03-06T05:14:07.38054859Z",
+        "Path": "nginx",
+        "Args": [
+            "-g",
+            "daemon off;"
+        ],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 3099,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2017-03-06T05:14:07.711597069Z",
+            "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "Image": "sha256:6b914bbcb89e49851990e064568dceee4d53a462f316ec36207599c12ae9ba65",
+        "ResolvConfPath": "/var/lib/docker/containers/4a1a9a9f4f509e68b7bb5591abb6af486fd20d252c8af62ed3480feb79e51450/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/4a1a9a9f4f509e68b7bb5591abb6af486fd20d252c8af62ed3480feb79e51450/hostname",
+        "HostsPath": "/var/lib/docker/containers/4a1a9a9f4f509e68b7bb5591abb6af486fd20d252c8af62ed3480feb79e51450/hosts",
+        "LogPath": "/var/lib/docker/containers/4a1a9a9f4f509e68b7bb5591abb6af486fd20d252c8af62ed3480feb79e51450/4a1a9a9f4f509e68b7bb5591abb6af486fd20d252c8af62ed3480feb79e51450-json.log",
+        "Name": "/peaceful_einstein",
+        "RestartCount": 0,
+        "Driver": "aufs",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": [
+                "/container/logs/nginx:/var/log/nginx"
+            ],
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "default",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "CapAdd": null,
+            "CapDrop": null,
+            "Dns": [],
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": true,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": null,
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DiskQuota": 0,
+            "KernelMemory": 0,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": -1,
+            "OomKillDisable": false,
+            "PidsLimit": 0,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0
+        },
+        "GraphDriver": {
+            "Name": "aufs",
+            "Data": null
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/container/logs/nginx",
+                "Destination": "/var/log/nginx",
+                "Mode": "",
+                "RW": true,
+                "Propagation": ""
+            }
+        ],
+        "Config": {
+            "Hostname": "4a1a9a9f4f50",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "ExposedPorts": {
+                "443/tcp": {},
+                "80/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "NGINX_VERSION=1.11.10-1~jessie"
+            ],
+            "Cmd": [
+                "nginx",
+                "-g",
+                "daemon off;"
+            ],
+            "ArgsEscaped": true,
+            "Image": "nginx",
+            "Volumes": null,
+            "WorkingDir": "",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {}
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "93645d57d4e9703dca0bdbb24ff095360e01052b976fe28dff87968c0294d3bc",
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "Ports": {
+                "443/tcp": [
+                    {
+                        "HostIp": "0.0.0.0",
+                        "HostPort": "1024"
+                    }
+                ],
+                "80/tcp": [
+                    {
+                        "HostIp": "0.0.0.0",
+                        "HostPort": "1025"
+                    }
+                ]
+            },
+            "SandboxKey": "/var/run/docker/netns/93645d57d4e9",
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "2bd1f90a2dbd88ce9bd53343f36a27da974890dd80623b6776fd82b586414ec7",
+            "Gateway": "172.17.0.1",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "172.17.0.2",
+            "IPPrefixLen": 16,
+            "IPv6Gateway": "",
+            "MacAddress": "02:42:ac:11:00:02",
+            "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "NetworkID": "49a36a7ad65bf6c215b6fb1241a17c12accb1d36b08cce3754365a1dbf5c31d2",
+                    "EndpointID": "2bd1f90a2dbd88ce9bd53343f36a27da974890dd80623b6776fd82b586414ec7",
+                    "Gateway": "172.17.0.1",
+                    "IPAddress": "172.17.0.2",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "MacAddress": "02:42:ac:11:00:02"
+                }
+            }
+        }
+    }
+]
+
+$ sudo docker inspect 4a1a9a9f4f50 | grep IPAddress
+            "SecondaryIPAddresses": null,
+            "IPAddress": "172.17.0.2",
+                    "IPAddress": "172.17.0.2",
+
+$ sudo docker inspect --format {{.NetworkSettings.Networks.bridge.IPAddress}} 4a1a9a9f4f50
+172.17.0.2
 ```
 
 </details>
