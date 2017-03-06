@@ -9,6 +9,7 @@ Docker setup and notes for Linux.
   - [Debug](06-debug.md)
   - [Security](07-security.md)
   - [Private Registry](08-private-registry.md)
+  - [Container Communication](09-continer-communcation.md)
 
 ## Benefits
   - Separation of concerns
@@ -25,6 +26,7 @@ Video tutorials -
   - Docker Fundamentals - https://training.docker.com/docker-fundamentals
   - Docker Operations - https://training.docker.com/docker-operations
 
-For managing data in containers, https://docs.docker.com/engine/tutorials/dockervolumes/ <br>
-Docker container networking, https://docs.docker.com/engine/userguide/networking/ <br>
+For managing data in containers - https://docs.docker.com/engine/tutorials/dockervolumes/ <br>
+Docker container networking - https://docs.docker.com/engine/userguide/networking/ <br>
+Understanding container communication - https://docs.docker.com/engine/userguide/networking/default_network/container-communication/ <br>
 Configure and run docker - https://docs.docker.com/engine/admin/ <br>
