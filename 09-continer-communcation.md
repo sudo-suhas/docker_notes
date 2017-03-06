@@ -7,12 +7,12 @@ For communicating across hosts, it might be simpler to map ports on to the host.
 
 Docker network commands are available through the Docker Engine CLI.
 These commands are:
-  - docker network create
-  - docker network connect
-  - docker network ls
-  - docker network rm
-  - docker network disconnect
-  - docker network inspect
+  - `docker network create`
+  - `docker network connect`
+  - `docker network ls`
+  - `docker network rm`
+  - `docker network disconnect`
+  - `docker network inspect`
 
 There are 2 types of Docker networks.
 A `bridge` network resides on a single host running an instance of Docker Engine.
@@ -21,7 +21,7 @@ If you run docker network create and supply only a network name, it creates a `b
 
 Unlike an `overlay` network has some requirements for creation. Read more [here](https://docs.docker.com/engine/userguide/networking/work-with-networks/#create-networks).
 
-**Create a network on host**
+### Create a network on host
 
 It is highly recommended to use the --subnet option while creating a network.
 If the --subnet is not specified, the docker daemon automatically
@@ -122,10 +122,10 @@ $ sudo docker network inspect 1b885c8aa2ed
 # Run ubuntu image and connect to the user created network
 $ sudo docker run -it --network isolated_nw ubuntu:16.04 bash
 
-root@d69774133e1c:/# apt-get update && apt-get install -y iputils-ping
+root@d69774133e1c:/$ apt-get update && apt-get install -y iputils-ping
 ...
 
-root@d69774133e1c:/# ping -w 4 redis
+root@d69774133e1c:/$ ping -w 4 redis
 PING redis (172.25.0.2) 56(84) bytes of data.
 64 bytes from redis.isolated_nw (172.25.0.2): icmp_seq=1 ttl=64 time=0.083 ms
 64 bytes from redis.isolated_nw (172.25.0.2): icmp_seq=2 ttl=64 time=0.054 ms
@@ -137,10 +137,10 @@ PING redis (172.25.0.2) 56(84) bytes of data.
 5 packets transmitted, 5 received, 0% packet loss, time 3999ms
 rtt min/avg/max/mdev = 0.048/0.057/0.083/0.016 ms
 
-root@d69774133e1c:/# apt-get install redis-tools
+root@d69774133e1c:/$ apt-get install redis-tools
 
 # Connect to the named redis container using redis-cli
-root@d69774133e1c:/# redis-cli -h redis
+root@d69774133e1c:/$ redis-cli -h redis
 redis:6379> set test 1
 OK
 redis:6379> exit
