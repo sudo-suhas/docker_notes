@@ -25,6 +25,6 @@ Video tutorials -
   - Docker Fundamentals - https://training.docker.com/docker-fundamentals
   - Docker Operations - https://training.docker.com/docker-operations
 
-For managing data in containers, https://docs.docker.com/engine/tutorials/dockervolumes/
-Docker container networking, https://docs.docker.com/engine/userguide/networking/
-Configure and run docker - https://docs.docker.com/engine/admin/
+For managing data in containers, https://docs.docker.com/engine/tutorials/dockervolumes/ <br>
+Docker container networking, https://docs.docker.com/engine/userguide/networking/ <br>
+Configure and run docker - https://docs.docker.com/engine/admin/ <br>

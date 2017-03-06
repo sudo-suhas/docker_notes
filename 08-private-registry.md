@@ -6,13 +6,13 @@ The Docker image needs to be tagged with the host IP or domain of the registry s
 
 ```bash
 # Tag iimage and specify the registry host
-$sudo docker tag <image id> myserver.com:5000/my-app:1.0
+$ sudo docker tag <image id> myserver.com:5000/my-app:1.0
 
 # Push image to registry
-$sudo docker push myserver.com:5000/my-app:1.0
+$ sudo docker push myserver.com:5000/my-app:1.0
 
 # Pull image from registry
-$sudo docker pull myserver.com:5000/my-app:1.0
+$ sudo docker pull myserver.com:5000/my-app:1.0
 ```
 
 <details>
