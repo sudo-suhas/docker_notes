@@ -9,7 +9,9 @@ Docker setup and notes for Linux.
   - [Debug](06-debug.md)
   - [Security](07-security.md)
   - [Private Registry](08-private-registry.md)
-  - [Container Communication](09-continer-communcation.md)
+  - [Docker Compose](09-docker-compose.md)
+  - [Container Communication](10-container-communcation.md)
+  - [Docker for Node.js](11-docker-for-node-js.md)
 
 ## Benefits
   - Separation of concerns

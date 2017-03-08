@@ -19,7 +19,8 @@ $ sudo apt-get install \
     apt-transport-https \
     ca-certificates \
     curl \
-    software-properties-common
+    software-properties-common \
+    jq
 
 # Add Docker's official GPG key
 $ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -

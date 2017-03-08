@@ -1,5 +1,5 @@
 ## Container Communication
-Docker enables us to run multiple containers on a sinle host.
+Docker enables us to run multiple containers on a single host.
 Each continer has its own isolated scope. If we want the containers to be able to
 communicate with each other, we should create and use a `docker network`.
 For example, a Web application backed by a REST API server.

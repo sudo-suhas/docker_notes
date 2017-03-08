@@ -2,7 +2,8 @@
 
 ### Manage Docker as a non-root user
 It is possible to use docker as a non-root user but this requires
-granting privileges equivalent to the root user. This is **not** recommended:
+granting privileges equivalent to the root user.
+Extreme caution is advised while adding users to the docker group.
 
 ```bash
 # Create the docker group.
