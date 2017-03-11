@@ -25,7 +25,7 @@ Documentation - https://docs.docker.com/engine/reference/commandline/version/
 <summary>Example</summary>
 
 ```bash
-$ sudo docker version
+$ docker version
 Client:
  Version:      17.03.0-ce
  API version:  1.26
@@ -55,7 +55,7 @@ Documentation - https://docs.docker.com/engine/reference/commandline/images/
 <summary>Example</summary>
 
 ```bash
-$ sudo docker images
+$ docker images
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
 hello-world         latest              48b5124b2768        6 weeks ago         1.84 kB
 ```
@@ -76,7 +76,7 @@ Documentation - https://docs.docker.com/engine/reference/commandline/run/, https
 <summary>Example</summary>
 
 ```bash
-$ sudo docker run --name test-docker hello-world
+$ docker run --name test-docker hello-world
 
 Hello from Docker!
 This message shows that your installation appears to be working correctly.
@@ -98,7 +98,7 @@ Share images, automate workflows, and more with a free Docker ID:
 For more examples and ideas, visit:
  https://docs.docker.com/engine/userguide/
 
-$ sudo docker run ubuntu:16.04 echo "Hello World"
+$ docker run ubuntu:16.04 echo "Hello World"
 Unable to find image 'ubuntu:16.04' locally
 16.04: Pulling from library/ubuntu
 d54efb8db41d: Pull complete
@@ -110,7 +110,7 @@ Digest: sha256:dd7808d8792c9841d0b460122f1acf0a2dd1f56404f8d1e56298048885e45535
 Status: Downloaded newer image for ubuntu:16.04
 Hello World
 
-$ sudo docker run ubuntu:16.04 ps ax
+$ docker run ubuntu:16.04 ps ax
   PID TTY      STAT   TIME COMMAND
     1 ?        Rs     0:00 ps ax
 ```
@@ -129,7 +129,7 @@ Cmd - `sudo docker run -it ubuntu:16.04 bash`
 <summary>Example</summary>
 
 ```bash
-$ sudo docker run -it ubuntu:16.04 bash
+$ docker run -it ubuntu:16.04 bash
 
 root@d167e274da21:/# echo "Hello World"
 Hello World
@@ -153,7 +153,7 @@ To exit the container without stopping the container, use `CTRL + P + Q`
 <summary>Example</summary>
 
 ```bash
-$ sudo docker run -it ubuntu:16.04 bash
+$ docker run -it ubuntu:16.04 bash
 
 root@d167e274da21:/# ps -ef
 UID        PID  PPID  C STIME TTY          TIME CMD
@@ -189,15 +189,15 @@ root     29657 29647  0 04:26 ?        00:00:07 docker-containerd -l unix:///var
 <summary>Example</summary>
 
 ```bash
-$ sudo docker run -d centos:7 ping 127.0.0.1 -c 10
+$ docker run -d centos:7 ping 127.0.0.1 -c 10
 268b938a8899c15822e3ac58e8a65843aa1c58fa0255902f07ed07ed5b51741f
 
-$ sudo docker ps
+$ docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
 268b938a8899        centos:7            "ping 127.0.0.1 -c 10"   2 seconds ago       Up 2 seconds                            quirky_stonebraker
 d167e274da21        ubuntu:16.04        "bash"                   35 minutes ago      Up 35 minutes                           trusting_clarke
 
-$ sudo docker logs 268b938a8899
+$ docker logs 268b938a8899
 PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.
 64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.022 ms
 64 bytes from 127.0.0.1: icmp_seq=2 ttl=64 time=0.025 ms
@@ -227,17 +227,17 @@ rtt min/avg/max/mdev = 0.022/0.027/0.038/0.007 ms
 <summary>Example</summary>
 
 ```bash
-$ sudo docker run -d -P tomcat:7
+$ docker run -d -P tomcat:7
 
-$ sudo docker ps
+$ docker ps
 CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS                    NAMES
 acce37e17255        tomcat:7            "catalina.sh run"   18 seconds ago      Up 17 seconds       0.0.0.0:1024->8080/tcp   kickass_clarke
 d167e274da21        ubuntu:16.04        "bash"              41 minutes ago      Up 41 minutes                                trusting_clarke
 
-$ sudo docker run -d -p 8080:80 nginx
+$ docker run -d -p 8080:80 nginx
 7a42922a197fde7d1bdc8391052fcb08f20234a0f68fbe3e18287efe03e54d02
 
-$ sudo docker ps
+$ docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                           NAMES
 7a42922a197f        nginx               "nginx -g 'daemon ..."   About a minute ago   Up About a minute   443/tcp, 0.0.0.0:8082->80/tcp   confident_engelbart
 
@@ -308,7 +308,7 @@ the /nginxlogs folder to the /var/log/nginx folder in the container
 $ ls /container
 ls: cannot access /container: No such file or directory
 
-$ sudo docker run -d -P -v /container/logs/nginx:/var/log/nginx nginx
+$ docker run -d -P -v /container/logs/nginx:/var/log/nginx nginx
 4a1a9a9f4f509e68b7bb5591abb6af486fd20d252c8af62ed3480feb79e51450
 
 $ ls /container
@@ -317,7 +317,7 @@ logs
 $ ls /container/logs/nginx/
 access.log  error.log
 
-$ sudo docker ps
+$ docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                                         NAMES
 4a1a9a9f4f50        nginx               "nginx -g 'daemon ..."   About a minute ago   Up About a minute   0.0.0.0:1025->80/tcp, 0.0.0.0:1024->443/tcp   peaceful_einstein
 
@@ -365,11 +365,11 @@ Documentation - https://docs.docker.com/engine/reference/commandline/ps/
 <summary>Example</summary>
 
 ```bash
-$ sudo docker ps
+$ docker ps
 CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
 d167e274da21        ubuntu:16.04        "bash"              26 minutes ago      Up 26 minutes                           trusting_clarke
 
-$ sudo docker ps -a
+$ docker ps -a
 CONTAINER ID        IMAGE               COMMAND                CREATED             STATUS                         PORTS               NAMES
 d167e274da21        ubuntu:16.04        "bash"                 27 minutes ago      Up 27 minutes                                      trusting_clarke
 07dcebb08695        ubuntu:16.04        "ps ax"                34 minutes ago      Exited (0) 34 minutes ago                          competent_mestorf
@@ -391,7 +391,7 @@ Documentation - https://docs.docker.com/engine/reference/commandline/commit/
 <summary>Example</summary>
 
 ```bash
-$ sudo docker run -it ubuntu:16.04 bash
+$ docker run -it ubuntu:16.04 bash
 
 root@881240cce4a3:/# curl 127.0.0.1
 bash: curl: command not found
@@ -639,14 +639,14 @@ root@e361cd827d8c:/# which curl
 
 root@881240cce4a3:/# exit
 
-$ sudo docker ps -a
+$ docker ps -a
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                                PORTS               NAMES
 881240cce4a3        ubuntu:16.04        "bash"                   4 minutes ago       Exited (127) Less than a second ago                       xenodochial_morse
 
-$ sudo docker commit 881240cce4a3 sudosuhas/myimg:1.0
+$ docker commit 881240cce4a3 sudosuhas/myimg:1.0
 sha256:6cd06ec4c83558b2d6c7e26f1e76f08a2bc4448712c3e6e4c156830d3ab2bec5
 
-$ sudo docker images
+$ docker images
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
 sudosuhas/myimg     1.0                 6cd06ec4c835        45 seconds ago      187 MB
 tomcat              7                   0f140c316816        2 days ago          356 MB
@@ -654,7 +654,7 @@ ubuntu              16.04               0ef2e08ed3fa        3 days ago          
 hello-world         latest              48b5124b2768        6 weeks ago         1.84 kB
 centos              7                   67591570dd29        2 months ago        192 MB
 
-$ sudo docker run -it sudosuhas/myimg:1.0 bash
+$ docker run -it sudosuhas/myimg:1.0 bash
 root@e361cd827d8c:/# which curl
 /usr/bin/curl
 ```
@@ -688,7 +688,7 @@ $ cd learn-docker/myimg
 # Create Dockerfile and paste contents from above
 $ nano Dockerfile
 
-$ sudo docker build -t sudosuhas/myimg:1.1 .
+$ docker build -t sudosuhas/myimg:1.1 .
 Sending build context to Docker daemon 2.048 kB
 Step 1/2 : FROM ubuntu:16.04
  ---> 0ef2e08ed3fa
@@ -939,7 +939,7 @@ done.
 Removing intermediate container 3c4f82a1e1af
 Successfully built f29b04202a45
 
-$ sudo docker images
+$ docker images
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
 sudosuhas/myimg     1.1                 f29b04202a45        6 minutes ago       187 MB
 sudosuhas/myimg     1.0                 6cd06ec4c835        31 minutes ago      187 MB
@@ -961,13 +961,13 @@ Documentation - https://docs.docker.com/engine/reference/commandline/start/
 <summary>Example</summary>
 
 ```bash
-$ sudo docker ps -a
+$ docker ps -a
 CONTAINER ID        IMAGE                     COMMAND                  CREATED             STATUS                           PORTS               NAMES
 7168327142c9        nginx                     "nginx -g 'daemon ..."   19 seconds ago      Exited (0) 3 seconds ago                             dreamy_hugle
 
-$ sudo docker start dreamy_hugle
+$ docker start dreamy_hugle
 
-$ sudo docker ps
+$ docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
 7168327142c9        nginx               "nginx -g 'daemon ..."   2 minutes ago       Up 29 seconds       80/tcp, 443/tcp     dreamy_hugle
 ```
@@ -984,7 +984,7 @@ Documentation - https://docs.docker.com/engine/reference/commandline/stop/
 <summary>Example</summary>
 
 ```bash
-$ sudo docker run -d nginx
+$ docker run -d nginx
 Unable to find image 'nginx:latest' locally
 latest: Pulling from library/nginx
 693502eb7dfb: Already exists
@@ -994,17 +994,17 @@ Digest: sha256:52a189e49c0c797cfc5cbfe578c68c225d160fb13a42954144b29af3fe4fe335
 Status: Downloaded newer image for nginx:latest
 949674a608258717306604871164423a5ca1bf3d7199a769ac589f52b4498c04
 
-$ sudo docker ps
+$ docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
 949674a60825        nginx               "nginx -g 'daemon ..."   28 seconds ago      Up 27 seconds       80/tcp, 443/tcp     elastic_wiles
 
-$ sudo docker stop 949674a60825
+$ docker stop 949674a60825
 949674a60825
 
-$ sudo docker ps
+$ docker ps
 CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
 
-$ sudo docker ps -a
+$ docker ps -a
 CONTAINER ID        IMAGE                     COMMAND                  CREATED             STATUS                           PORTS               NAMES
 7168327142c9        nginx                     "nginx -g 'daemon ..."   19 seconds ago      Exited (0) 3 seconds ago                             dreamy_hugle
 
@@ -1024,14 +1024,14 @@ Documentation - https://docs.docker.com/engine/reference/commandline/exec/
 <summary>Example</summary>
 
 ```bash
-$ sudo docker run -d tomcat:7
+$ docker run -d tomcat:7
 0d9b134d5c25e7595dce30451d1295774d24be28912f9b469fb68d4f5cdea34c
 
-$ sudo docker ps
+$ docker ps
 CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
 0d9b134d5c25        tomcat:7            "catalina.sh run"   9 seconds ago       Up 9 seconds        8080/tcp            determined_jepsen
 
-$ sudo docker exec -it 0d9b134d5c25 bash
+$ docker exec -it 0d9b134d5c25 bash
 
 root@0d9b134d5c25:/usr/local/tomcat# ps -ef
 UID        PID  PPID  C STIME TTY          TIME CMD
@@ -1042,7 +1042,7 @@ root        32    28  0 12:10 ?        00:00:00 ps -ef
 root@0d9b134d5c25:/usr/local/tomcat# exit
 exit
 
-$ sudo docker ps
+$ docker ps
 CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS              PORTS               NAMES
 0d9b134d5c25        tomcat:7            "catalina.sh run"   About a minute ago   Up About a minute   8080/tcp            determined_jepsen
 
@@ -1060,15 +1060,15 @@ Documentation - https://docs.docker.com/engine/reference/commandline/rm/
 <summary>Example</summary>
 
 ```bash
-$ sudo docker ps -a
+$ docker ps -a
 CONTAINER ID        IMAGE                     COMMAND                  CREATED             STATUS                            PORTS               NAMES
 0d9b134d5c25        tomcat:7                  "catalina.sh run"        4 minutes ago       Exited (143) About a minute ago                       determined_jepsen
 7168327142c9        nginx                     "nginx -g 'daemon ..."   12 minutes ago      Exited (0) 9 minutes ago                              dreamy_hugle
 
-$ sudo docker rm determined_jepsen
+$ docker rm determined_jepsen
 determined_jepsen
 
-$ sudo docker ps -a
+$ docker ps -a
 CONTAINER ID        IMAGE                     COMMAND                  CREATED             STATUS                           PORTS               NAMES
 7168327142c9        nginx                     "nginx -g 'daemon ..."   14 minutes ago      Exited (0) 11 minutes ago                            dreamy_hugle
 ```
@@ -1085,7 +1085,7 @@ Documentation - https://docs.docker.com/engine/reference/commandline/rmi/
 <summary>Example</summary>
 
 ```bash
-$ sudo docker images
+$ docker images
 REPOSITORY            TAG                 IMAGE ID            CREATED             SIZE
 sudosuhas/entryping   1.0                 a7b89ac9eb56        32 minutes ago      174 MB
 sudosuhas/ping        1.0                 38996ff9a9af        40 minutes ago      174 MB
@@ -1097,18 +1097,18 @@ ubuntu                16.04               0ef2e08ed3fa        3 days ago        
 hello-world           latest              48b5124b2768        6 weeks ago         1.84 kB
 centos                7                   67591570dd29        2 months ago        192 MB
 
-$ sudo docker rmi sudosuhas/myimg:1.0
+$ docker rmi sudosuhas/myimg:1.0
 Error response from daemon: conflict: unable to remove repository reference "sudosuhas/myimg:1.0" (must force) - container e361cd827d8c is using its referenced image 6cd06ec4c835
 
-$ sudo docker rm e361cd827d8c
+$ docker rm e361cd827d8c
 e361cd827d8c
 
-$ sudo docker rmi sudosuhas/myimg:1.0
+$ docker rmi sudosuhas/myimg:1.0
 Untagged: sudosuhas/myimg:1.0
 Deleted: sha256:6cd06ec4c83558b2d6c7e26f1e76f08a2bc4448712c3e6e4c156830d3ab2bec5
 Deleted: sha256:cc0227527dc20ee51e227e5d3e6750a9b8d4e5b29d4e38bd520187285d619c23
 
-$ sudo docker images
+$ docker images
 REPOSITORY            TAG                 IMAGE ID            CREATED             SIZE
 sudosuhas/entryping   1.0                 a7b89ac9eb56        35 minutes ago      174 MB
 sudosuhas/ping        1.0                 38996ff9a9af        43 minutes ago      174 MB
@@ -1133,7 +1133,7 @@ Documentation - https://docs.docker.com/engine/reference/commandline/push/
 <summary>Example</summary>
 
 ```bash
-$ sudo docker images
+$ docker images
 REPOSITORY            TAG                 IMAGE ID            CREATED             SIZE
 sudosuhas/entryping   1.0                 a7b89ac9eb56        35 minutes ago      174 MB
 sudosuhas/ping        1.0                 38996ff9a9af        43 minutes ago      174 MB
@@ -1144,11 +1144,11 @@ ubuntu                16.04               0ef2e08ed3fa        3 days ago        
 hello-world           latest              48b5124b2768        6 weeks ago         1.84 kB
 centos                7                   67591570dd29        2 months ago        192 MB
 
-$ sudo docker login --username=sudosuhas
+$ docker login --username=sudosuhas
 Password:
 Login Succeeded
 
-$ sudo docker push sudosuhas/entryping:1.0
+$ docker push sudosuhas/entryping:1.0
 The push refers to a repository [docker.io/sudosuhas/entryping]
 61eed8dbb6f1: Pushed
 56827159aa8b: Pushed
@@ -1174,7 +1174,7 @@ Documentation - https://docs.docker.com/engine/reference/commandline/tag/
 <summary>Example</summary>
 
 ```bash
-$ sudo docker images
+$ docker images
 REPOSITORY            TAG                 IMAGE ID            CREATED             SIZE
 sudosuhas/entryping   1.0                 a7b89ac9eb56        35 minutes ago      174 MB
 sudosuhas/ping        1.0                 38996ff9a9af        43 minutes ago      174 MB
@@ -1185,9 +1185,9 @@ ubuntu                16.04               0ef2e08ed3fa        3 days ago        
 hello-world           latest              48b5124b2768        6 weeks ago         1.84 kB
 centos                7                   67591570dd29        2 months ago        192 MB
 
-$ sudo docker tag f29b04202a45 sudosuhas/myubuntuimg:1.0
+$ docker tag f29b04202a45 sudosuhas/myubuntuimg:1.0
 
-$ sudo docker tag sudosuhas/myimg:1.0 sudosuhas/myubuntuimg:1.0
+$ docker tag sudosuhas/myimg:1.0 sudosuhas/myubuntuimg:1.0
 ```
 
 </details>
@@ -1203,11 +1203,11 @@ Documentation - https://docs.docker.com/engine/reference/commandline/inspect/
 <summary>Example</summary>
 
 ```bash
-$ sudo docker ps
+$ docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                         NAMES
 4a1a9a9f4f50        nginx               "nginx -g 'daemon ..."   5 minutes ago       Up 5 minutes        0.0.0.0:1025->80/tcp, 0.0.0.0:1024->443/tcp   peaceful_einstein
 
-$ sudo docker inspect 4a1a9a9f4f50
+$ docker inspect 4a1a9a9f4f50
 [
     {
         "Id": "4a1a9a9f4f509e68b7bb5591abb6af486fd20d252c8af62ed3480feb79e51450",
@@ -1411,12 +1411,12 @@ $ sudo docker inspect 4a1a9a9f4f50
     }
 ]
 
-$ sudo docker inspect 4a1a9a9f4f50 | grep IPAddress
+$ docker inspect 4a1a9a9f4f50 | grep IPAddress
             "SecondaryIPAddresses": null,
             "IPAddress": "172.17.0.2",
                     "IPAddress": "172.17.0.2",
 
-$ sudo docker inspect --format {{.NetworkSettings.Networks.bridge.IPAddress}} 4a1a9a9f4f50
+$ docker inspect --format {{.NetworkSettings.Networks.bridge.IPAddress}} 4a1a9a9f4f50
 172.17.0.2
 ```
 

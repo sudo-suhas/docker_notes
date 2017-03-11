@@ -31,17 +31,17 @@ Such overlaps can cause connectivity issues or failures when containers are conn
 
 ```bash
 # --internal flag restricts external access to network
-$ sudo docker network create --driver bridge --subnet 172.25.0.0/16 isolated_nw
+$ docker network create --driver bridge --subnet 172.25.0.0/16 isolated_nw
 1b885c8aa2ed91486313783bbd3fc0b5e59ae9fc30e4b6ade0c01f751b902e6e
 
-$ sudo docker network ls
+$ docker network ls
 NETWORK ID          NAME                DRIVER              SCOPE
 502f7718841e        bridge              bridge              local
 800397b59b95        host                host                local
 1b885c8aa2ed        isolated_nw         bridge              local
 2591db9cf83f        none                null                local
 
-$ sudo docker network inspect 1b885c8aa2ed
+$ docker network inspect 1b885c8aa2ed
 [
     {
         "Name": "isolated_nw",
@@ -67,7 +67,7 @@ $ sudo docker network inspect 1b885c8aa2ed
     }
 ]
 
-$ sudo docker run -d -P --name redis --network isolated_nw redis
+$ docker run -d -P --name redis --network isolated_nw redis
 Unable to find image 'redis:latest' locally
 latest: Pulling from library/redis
 693502eb7dfb: Pull complete
@@ -81,11 +81,11 @@ Digest: sha256:4c8fb09e8d634ab823b1c125e64f0e1ceaf216025aa38283ea1b42997f1e8059
 Status: Downloaded newer image for redis:latest
 393b24ca462d3e6cc0caa73a040e8b4b6067fbefef58f30ec207fc511cf83811
 
-$ sudo docker ps
+$ docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
 393b24ca462d        redis               "docker-entrypoint..."   6 seconds ago       Up 5 seconds        0.0.0.0:1024->6379/tcp   redis
 
-$ sudo docker network inspect 1b885c8aa2ed
+$ docker network inspect 1b885c8aa2ed
 [
     {
         "Name": "isolated_nw",
@@ -120,7 +120,7 @@ $ sudo docker network inspect 1b885c8aa2ed
 ]
 
 # Run ubuntu image and connect to the user created network
-$ sudo docker run -it --network isolated_nw ubuntu:16.04 bash
+$ docker run -it --network isolated_nw ubuntu:16.04 bash
 
 root@d69774133e1c:/$ apt-get update && apt-get install -y iputils-ping
 ...
@@ -145,12 +145,12 @@ redis:6379> set test 1
 OK
 redis:6379> exit
 
-$ sudo docker ps
+$ docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
 393b24ca462d        redis               "docker-entrypoint..."   11 minutes ago      Up 11 minutes       0.0.0.0:1024->6379/tcp   redis
 
 # Connect to the redis container and get a bash terminal
-$ sudo docker exec -it 393b24ca462d bash
+$ docker exec -it 393b24ca462d bash
 root@393b24ca462d:/data# redis-cli
 # Check if the value we set into 'test' is there
 127.0.0.1:6379> get test

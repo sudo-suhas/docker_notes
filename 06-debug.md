@@ -8,7 +8,7 @@
 $ sudo service docker stop
 docker stop/waiting
 
-$ sudo dockerd -D --log-level debug &
+$ dockerd -D --log-level debug &
 [1] 3481
 DEBU[0000] docker group found. gid: 999
 DEBU[0000] Listener created for HTTP on unix (/var/run/docker.sock)
@@ -234,7 +234,7 @@ DEBU[0001] Registering POST, /networks/prune
 DEBU[0001] Registering DELETE, /networks/{id:.*}
 INFO[0001] API listen on /var/run/docker.sock
 
-$ sudo docker images
+$ docker images
 DEBU[0042] Calling GET /_ping
 DEBU[0042] Calling GET /v1.26/images/json
 REPOSITORY              TAG                 IMAGE ID            CREATED             SIZE
@@ -248,7 +248,7 @@ ubuntu                  16.04               0ef2e08ed3fa        6 days ago      
 hello-world             latest              48b5124b2768        7 weeks ago         1.84 kB
 centos                  7                   67591570dd29        2 months ago        192 MB
 
-$ sudo docker ps
+$ docker ps
 DEBU[0046] Calling GET /_ping
 DEBU[0046] Calling GET /v1.26/containers/json
 CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES

@@ -27,26 +27,42 @@ Some considerations for running node.js application using docker image
     We shouldn't have to connect to the shell terminal of the container to do so.
     It would also be ideal if the logs were to persist between subsequent builds and deployments.
     For this, we can use a volume. But care needs to be taken that there is no issue with permissions.
-    For example, in the `docker-compose.yml` if we specify `/var/log/$APP_NAME:/home/node/$APP_NAME/logs`,
-    if the folder /var/log/$APP_NAME does not exist, docker creates the folder as root!
+    For example, in the `docker-compose.yml` if we specify `/var/log/example-app:/home/node/example-app/logs`,
+    if the folder /var/log/example-app does not exist, docker creates the folder as root!
     So when the app, running as non-root user tries to write to it:
     ```
-    odyssey_container | events.js:160
-    odyssey_container |       throw er; // Unhandled 'error' event
-    odyssey_container |       ^
-    odyssey_container |
-    odyssey_container | Error: EACCES: permission denied, open '/home/node/odyssey/logs/webserver.out.log'
-    odyssey_container |     at Error (native)
+    example_app_container | events.js:160
+    example_app_container |       throw er; // Unhandled 'error' event
+    example_app_container |       ^
+    example_app_container |
+    example_app_container | Error: EACCES: permission denied, open '/home/node/example-app/logs/webserver.out.log'
+    example_app_container |     at Error (native)
 
     ```
     This can even crash the container! So to keep it simple, create a folder using the non-root user,
     give full permissions and then use it with docker volume.
     Typically, application logs are stored in /var/log.
 
-### Example
-The example covers building an image using `docker-compose`.
-The image is automatically tagged with the version from the `package.json` file.
-We use a simple shell script for picking the version from `package.json` and passing it to docker-compose.
+## Example
+The example covers building an image and running it on the remote server.
+The image is automatically tagged with the version from the `package.json` file as well as 'latest'.
+We use a simple shell script for picking the version from `package.json`.
+For running the image from Docker registry, we need to pull and start the container.
+Another important thing that needs to be done is create and set appropriate permissions on the logs folder
+which will be mounted on docker container.
+
+```bash
+$ mkdir $HOME/logs/example-app
+$ chmod 777 $HOME/logs/example-app
+```
+
+So the steps are:
+  - [Build and push the docker image to the registry](#build-image)
+  - [Copy and place the docker compose file into the host machine.](#copy-docker-compose-file)
+  - [Run Docker image on host](#run-docker-image)
+
+### Build Image
+A shell script is used to build the image with tags and push to the repository.
 
 The `.dockerignore` file can be largely similar to the `.gitignore` file but also ignore the following:
 ```
@@ -64,9 +80,9 @@ docker-compose.*yml
 
 #### `docker_build.sh`
 This script tags the image with both latest and application version.
-It could just as easily pick the docker user from either the `package.json` or from the environment.
-Another importaant thing this script does is create and set appropriate permissions on the logs folder
-which will be mounted on docker container.
+If a private registry is being used, the user must be logged into Docker.
+
+Additionally, it will clean up any images which no longer have any tags associated.
 
 If `jq`, used to parse and extract values from `json` files, is not installed,
 run `sudo apt-get update && sudo apt-get install jq`
@@ -80,14 +96,9 @@ set -e
 echo
 echo "Extracting version and name from package.json"
 
-APP_NAME=`jq -r '.name' package.json`
-DOCKER_IMAGE_NAME="$APP_NAME"_img
+APP_NAME=`jq -r '.name' package.json` # Or just keep the name in the script
+REPO_URL='<PRIVATE_DOCKER_REGISTRY_URL>'
 TAG=`jq -r '.version' package.json`
-
-echo
-echo "Creating logs folder($HOME/logs/$APP_NAME) if required"
-mkdir -p $HOME/logs/$APP_NAME
-chmod 777 $HOME/logs/$APP_NAME
 
 echo
 echo "Building docker image for app '${APP_NAME}'"
@@ -95,49 +106,23 @@ echo "Building docker image for app '${APP_NAME}'"
 echo
 echo "Tagging image with version '${TAG}'"
 
-export APP_NAME=$APP_NAME
-export TAG=$TAG
+echo
+docker build --pull --tag "$APP_NAME:$TAG" --tag "$APP_NAME:latest" .
 
 echo
-docker-compose build
+echo "Tagging images with Docker repository URL"
+docker tag "$APP_NAME:$TAG" "$REPO_URL/$APP_NAME:$TAG"
+docker tag "$APP_NAME:latest" "$REPO_URL/$APP_NAME:latest"
 
 echo
-echo "Tagging image ${DOCKER_IMAGE_NAME} with 'latest' tag"
+echo "Removing orphaned images"
+if docker rmi $(docker images --filter "dangling=true" -q --no-trunc); then :; fi
 
-docker tag $DOCKER_IMAGE_NAME:"$TAG" $DOCKER_IMAGE_NAME:latest
-
-```
-
-#### `docker-compose.yml`
-This file is used for build. It also has some instructions not relevant to build like
-`environment`, `mem_limit` and `stop_grace_period` but that can be useful for running the application
-or at least as a reference for writing the `docker-compose.prod.yml`.
-
-The build tags the image with environment variable `$TAG` which is passed in using the shell script above.
-The logs are written to a host folder but care needs to be taken that it has appropriate permissions.
-
-```yml
-version: '2.1'
-
-services:
-  odyssey:
-    image: "${APP_NAME}_img:${TAG}"
-    container_name: "${APP_NAME}_container"
-    build:
-      context: .
-      args:
-        - APP_NAME
-    volumes:
-      - $HOME/logs/$APP_NAME:/home/node/$APP_NAME/logs
-    restart: always
-    environment:
-      NODE_ENV: staging
-      DEBUG: odyssey:*,express:application,express:router:route,compression
-    ports:
-      - "8085:8085"
-    mem_limit: "300M"
-    memswap_limit: "1G"
-    stop_grace_period: 30s
+# Push to registry
+echo
+echo "Pushing to registry"
+docker push "$REPO_URL/$APP_NAME:$TAG"
+docker push "$REPO_URL/$APP_NAME:latest"
 
 ```
 
@@ -148,10 +133,6 @@ Notes inline
 # Start off with the `node:6.10.0-alpine` image for keeping the size under check
 FROM node:6.10.0-alpine
 
-
-# `ARG APP_NAME` is picked up by the shell script and then passed as argument by `docker-compose.yml`
-ARG APP_NAME
-
 # Offical image has npm log verbosity as info. More info - https://github.com/nodejs/docker-node#verbosity
 ENV NPM_CONFIG_LOGLEVEL warn
 
@@ -159,9 +140,9 @@ ENV NPM_CONFIG_LOGLEVEL warn
 ENV HOME /home/node
 
 
-# Set our `WORKDIR` to /home/node/$APP_NAME
+# Set our `WORKDIR` to /home/node/example-app
 # Recommended by Dockerfile best practices - https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/#workdir
-WORKDIR $HOME/$APP_NAME
+WORKDIR $HOME/example-app
 
 
 # Node.js process running as PID 1 will not respond to SIGTERM (CTRL-C) and similar signals
@@ -175,7 +156,7 @@ RUN apk add --update tini \
 
 # Add our package.json and install *before* adding our application files
 # Files are copied as `root` user
-COPY package.json npm-shrinkwrap.json $HOME/$APP_NAME/
+COPY package.json npm-shrinkwrap.json $HOME/example-app/
 
 # Change ownership to `node` user so that we need not change ownership of files generated by npm install
 RUN chown -R node:node $HOME/*
@@ -201,13 +182,13 @@ USER root
 # This is done because if we copy directly to WORKDIR and then change permissions,
 # we end up having to pay the cost for running the command for node_modules as well.
 # Excluding `node_modules` using following command did not work either
-# find $HOME/$APP_NAME -mindepth 1 -type -d -not -path '$HOME/$APP_NAME/node_modules' -print0 | xargs -0 chown node:node
-COPY . /tmp/$APP_NAME
-RUN chown -R node:node /tmp/$APP_NAME \
+# find $HOME/example-app -mindepth 1 -type -d -not -path '$HOME/example-app/node_modules' -print0 | xargs -0 chown node:node
+COPY . /tmp/example-app
+RUN chown -R node:node /tmp/example-app \
     # copy folder and preserve permissions
-    && cp -rp /tmp/$APP_NAME $HOME \
+    && cp -rp /tmp/example-app $HOME \
     # remove files from tmp
-    && rm -rf /tmp/$APP_NAME
+    && rm -rf /tmp/example-app
 
 
 # Switch back to `node` user and run postinstall, build
@@ -233,33 +214,97 @@ CMD ["node", "src/app.js"]
 ```
 $ docker images
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
-odyssey_img         0.1.0               0e7991e7a1c9        44 seconds ago      360 MB
-odyssey_img         latest              0e7991e7a1c9        44 seconds ago      360 MB
+example-app             0.1.0               2e34a7fd38ca        18 hours ago        360 MB
+example-app             latest              2e34a7fd38ca        18 hours ago        360 MB
 
-$ docker history 0e7991e7a1c9
-IMAGE               CREATED              CREATED BY                                      SIZE
-0e7991e7a1c9        About a minute ago   /bin/sh -c #(nop)  CMD ["node" "src/app.js"]    0 B
-4d158a4a7bd5        About a minute ago   /bin/sh -c #(nop)  ENTRYPOINT ["/sbin/tini...   0 B
-da08413798fb        About a minute ago   |1 APP_NAME=odyssey /bin/sh -c npm run build    13.9 MB
-d77231f4c1f1        2 minutes ago        /bin/sh -c #(nop)  USER [node]                  0 B
-a31c81918434        2 minutes ago        |1 APP_NAME=odyssey /bin/sh -c chown -R no...   722 kB
-dae513cda748        2 minutes ago        /bin/sh -c #(nop) COPY dir:19e6d77252f2e8c...   722 kB
-e3d2b457aad6        2 minutes ago        /bin/sh -c #(nop)  USER [root]                  0 B
-3de01158af87        2 minutes ago        |1 APP_NAME=odyssey /bin/sh -c npm config ...   105 MB
-20ae4b9e2b2b        55 minutes ago       /bin/sh -c #(nop)  USER [node]                  0 B
-0ad7b0fa0563        55 minutes ago       |1 APP_NAME=odyssey /bin/sh -c chown -R no...   205 kB
-5e0805e0ac91        55 minutes ago       /bin/sh -c #(nop) COPY multi:4e7aae30da491...   205 kB
-69d9e4e98b16        55 minutes ago       |1 APP_NAME=odyssey /bin/sh -c apk add --u...   186 MB
-09cf694663c3        55 minutes ago       /bin/sh -c #(nop) WORKDIR /home/node/odyssey    0 B
-a8d501fa717b        55 minutes ago       /bin/sh -c #(nop)  ENV HOME=/home/node          0 B
-b14833c71036        55 minutes ago       /bin/sh -c #(nop)  ENV NPM_CONFIG_LOGLEVEL...   0 B
-c8818f105b97        55 minutes ago       /bin/sh -c #(nop)  ARG APP_NAME                 0 B
-8232a8b9c483        4 days ago           /bin/sh -c #(nop)  CMD ["node"]                 0 B
-<missing>           4 days ago           /bin/sh -c apk add --no-cache --virtual .b...   3.56 MB
-<missing>           4 days ago           /bin/sh -c #(nop)  ENV YARN_VERSION=0.21.3      0 B
-<missing>           4 days ago           /bin/sh -c adduser -D -u 1000 node     && ...   45.4 MB
-<missing>           4 days ago           /bin/sh -c #(nop)  ENV NODE_VERSION=6.10.0      0 B
-<missing>           4 days ago           /bin/sh -c #(nop)  ENV NPM_CONFIG_LOGLEVEL...   0 B
-<missing>           4 days ago           /bin/sh -c #(nop) ADD file:3df55c321c1c8d7...   4.81 MB
+$ docker history 2e34a7fd38ca
+IMAGE               CREATED             CREATED BY                                        SIZE
+2e34a7fd38ca        18 hours ago        /bin/sh -c #(nop)  CMD ["node" "src/app.js"]      0 B
+390b0bbfb1e3        18 hours ago        /bin/sh -c #(nop)  ENTRYPOINT ["/sbin/tini...     0 B
+651f30d33339        18 hours ago        /bin/sh -c npm run build                          13.9 MB
+fa681907e1e8        18 hours ago        /bin/sh -c #(nop)  USER [node]                    0 B
+ef85d8493d1d        18 hours ago        /bin/sh -c chown -R node:node /tmp/example-app... 722 kB
+bdbc0df14ca8        18 hours ago        /bin/sh -c #(nop) COPY dir:4b0aaece6449624...     722 kB
+a6cc7a5a1593        18 hours ago        /bin/sh -c #(nop)  USER [root]                    0 B
+df2e01b8a7be        18 hours ago        /bin/sh -c npm config set registry http://...     105 MB
+5d0c25935beb        18 hours ago        /bin/sh -c #(nop)  USER [node]                    0 B
+c13f2d367b05        18 hours ago        /bin/sh -c chown -R node:node $HOME/*             205 kB
+38dbf1d12e58        18 hours ago        /bin/sh -c #(nop) COPY multi:14dbf9e77c89c...     205 kB
+9ca830beb22e        18 hours ago        /bin/sh -c apk add --update tini     && ap...     186 MB
+e1fcf66602ee        18 hours ago        /bin/sh -c #(nop) WORKDIR /home/node/example-app  0 B
+6e3f1a0ad02f        18 hours ago        /bin/sh -c #(nop)  ENV HOME=/home/node            0 B
+75cd82ef5bf5        18 hours ago        /bin/sh -c #(nop)  ENV NPM_CONFIG_LOGLEVEL...     0 B
+8232a8b9c483        7 days ago          /bin/sh -c #(nop)  CMD ["node"]                   0 B
+<missing>           7 days ago          /bin/sh -c apk add --no-cache --virtual .b...     3.56 MB
+<missing>           7 days ago          /bin/sh -c #(nop)  ENV YARN_VERSION=0.21.3        0 B
+<missing>           7 days ago          /bin/sh -c adduser -D -u 1000 node     && ...     45.4 MB
+<missing>           7 days ago          /bin/sh -c #(nop)  ENV NODE_VERSION=6.10.0        0 B
+<missing>           7 days ago          /bin/sh -c #(nop)  ENV NPM_CONFIG_LOGLEVEL...     0 B
+<missing>           7 days ago          /bin/sh -c #(nop) ADD file:3df55c321c1c8d7...     4.81 MB
 
 ```
+
+### Copy docker-compose File
+This can be done using `rsync`. It will also create target directory if it does not exists.
+
+```bash
+rsync -aq --rsync-path="mkdir -p /home/dockeruser/dist/docker/example-app && rsync" \
+	docker-compose.yml \
+    -e 'ssh -i ssl-cert.pem' \
+    dockeruser@my.docker.host:/home/dockeruser/dist/docker/example-app
+```
+
+### Run Docker image
+SSH into the host
+  - Stop container if running
+  - Pull latest image and run it using `docker-compose`
+
+Another important thing that needs to be done is create and set appropriate permissions on the logs folder
+which will be mounted on docker container. This is a one time task.
+
+```bash
+ssh -i ssl-cert.pem \
+	dockeruser@my.docker.host '
+
+cd ~/dist/docker/example-app
+
+if docker stop example_app_container; then docker rm example_app_container; fi
+
+docker-compose pull && docker-compose up -d
+
+if docker rmi $(docker images --filter "dangling=true" -q --no-trunc); then :; fi
+
+exit
+
+'
+```
+
+#### `docker-compose.yml`
+This is used to specify `docker run` instructions in a easily readable, maintainable way.
+It also maps volumes and connects to the docker isolated network(needs to be created prior).
+The logs are written to a host folder but care needs to be taken that it has appropriate permissions.
+
+```yml
+version: '2.1'
+
+services:
+  example_app:
+    image: "<PRIVATE_DOCKER_REGISTRY_URL>/example_app:latest"
+    container_name: "example_app_container"
+    volumes:
+      - $HOME/logs/example-app:/home/node/example-app/logs
+    restart: always
+    environment:
+      NODE_ENV: staging
+      DEBUG: example_app:*,express:application,express:router:route,compression
+    ports:
+      - "8081:8085"
+    mem_limit: "300M"
+    memswap_limit: "1G"
+    stop_grace_period: 30s
+
+```
+
+### Other resources
+  - http://jdlm.info/articles/2016/03/06/lessons-building-node-app-docker.html
+  - http://bitjudo.com/blog/2014/03/13/building-efficient-dockerfiles-node-dot-js/

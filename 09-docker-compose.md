@@ -88,3 +88,9 @@ networks:
 ### Running your application
   - Use the `docker-compose up` command. `-d` flag can be used to run it in the background.
   - It will build the image for each service, create and start the containers
+  - `docker-compose pull` can be used to fetch the latest from the remote registry.
+    This is useful when we already have the image on the host but it is no longer up-to-date.
+
+```bash
+$ docker-compose pull && docker-compose up -d
+```

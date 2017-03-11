@@ -36,9 +36,6 @@ $ sudo apt-get update
 
 # Install the latest version of Docker
 $ sudo apt-get install docker-ce
-
-# Verify that Docker CE or Docker EE is installed correctly by running the hello-world image
-$ sudo docker run hello-world
 ```
 
 Docker Resource - https://docs.docker.com/engine/installation/linux/ubuntu/

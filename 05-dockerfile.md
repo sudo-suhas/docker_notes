@@ -69,7 +69,7 @@ CMD ["ping", "127.0.0.1", "-c", "10"]
 ```
 
 ```bash
-$ sudo docker build -t sudosuhas/ping:1.0 .
+$ docker build -t sudosuhas/ping:1.0 .
 Sending build context to Docker daemon 2.048 kB
 Step 1/3 : FROM ubuntu:16.04
  ---> 0ef2e08ed3fa
@@ -176,7 +176,7 @@ Step 3/3 : CMD ping 127.0.0.1 -c 10
 Removing intermediate container 4a9e01030bc8
 Successfully built 38996ff9a9af
 
-$ sudo docker run sudosuhas/ping:1.0
+$ docker run sudosuhas/ping:1.0
 PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.
 64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.026 ms
 64 bytes from 127.0.0.1: icmp_seq=2 ttl=64 time=0.043 ms
@@ -193,7 +193,7 @@ PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.
 10 packets transmitted, 10 received, 0% packet loss, time 8999ms
 rtt min/avg/max/mdev = 0.026/0.037/0.043/0.009 ms
 
-$ sudo docker run sudosuhas/ping:1.0 echo "hello world"
+$ docker run sudosuhas/ping:1.0 echo "hello world"
 hello world
 ```
 
@@ -210,7 +210,7 @@ ENTRYPOINT ["ping"]
 ```
 
 ```bash
-$ sudo docker build -t sudosuhas/entryping:1.0 .
+$ docker build -t sudosuhas/entryping:1.0 .
 Sending build context to Docker daemon 2.048 kB
 Step 1/3 : FROM ubuntu:16.04
  ---> 0ef2e08ed3fa
@@ -223,13 +223,13 @@ Step 3/3 : ENTRYPOINT ping
 Removing intermediate container 5f9072de1a71
 Successfully built a7b89ac9eb56
 
-$ sudo docker run sudosuhas/entryping:1.0
+$ docker run sudosuhas/entryping:1.0
 Usage: ping [-aAbBdDfhLnOqrRUvV] [-c count] [-i interval] [-I interface]
             [-m mark] [-M pmtudisc_option] [-l preload] [-p pattern] [-Q tos]
             [-s packetsize] [-S sndbuf] [-t ttl] [-T timestamp_option]
             [-w deadline] [-W timeout] [hop1 ...] destination
 
-$ sudo docker run sudosuhas/entryping:1.0 127.0.0.1 -c 5
+$ docker run sudosuhas/entryping:1.0 127.0.0.1 -c 5
 PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.
 64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.027 ms
 64 bytes from 127.0.0.1: icmp_seq=2 ttl=64 time=0.034 ms
