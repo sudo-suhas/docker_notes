@@ -91,7 +91,7 @@ $ pip install --upgrade --user awscli
 ```
 
 **Add awscli to $PATH** <br>
-Add `~/.local/bin` to `$PATH`. Add the line `export PATH=~/.local/bin:$PATH` to `~/.profile`.
+Add `~/.local/bin` to `$PATH`. Add the line `export PATH=~/.local/bin:$PATH` to `~/.profile`. <br>
 Run `source ~/.profile` to load the updated `$PATH`<br>
 http://docs.aws.amazon.com/cli/latest/userguide/awscli-install-linux.html#awscli-install-linux-path
 
@@ -105,15 +105,18 @@ Retrieve the docker login command that you can use to authenticate your Docker c
 
 ```bash
 $ aws ecr get-login --region ap-southeast-1
-docker login -u AWS -p <SOME_REALLY_LONG_PASSWORD> -e none <ECR_URL>
+docker login -u AWS -p <SOME_REALLY_LONG_PASSWORD> -e none https://<REGISTRY ID>.dkr.ecr.ap-southeast-1.amazonaws.com
 
 # Copy and run command
 # -e option for email is deprecated and no longer needed
-$ docker login -u AWS -p <SOME_REALLY_LONG_PASSWORD> <ECR_URL>
+$ docker login -u AWS -p <SOME_REALLY_LONG_PASSWORD> https://<REGISTRY ID>.dkr.ecr.ap-southeast-1.amazonaws.com
 Login succeeded
 
 # Create new repository - http://docs.aws.amazon.com/cli/latest/reference/ecr/create-repository.html
-aws ecr create-repository --repository-name project-name/docker-image-name
+$ aws ecr create-repository --repository-name project-name/docker-image-name
+
+# Logout
+$ docker logout https://<REGISTRY ID>.dkr.ecr.ap-southeast-1.amazonaws.com
 ```
 
 #### Amazon ECR Docker Credential Helper
