@@ -1,4 +1,5 @@
 ## Debug
+  - [ctop](https://github.com/bcicen/ctop) can be used for light weight monitoring
   - Use `service` command to start, stop or restart Docker daemon
   - While debugging, run Docker daemon with appropriate log level `sudo dockerd -D --log-level debug &`
   - To stop the docker daemon, use `sudo kill $(pidof dockerd)`

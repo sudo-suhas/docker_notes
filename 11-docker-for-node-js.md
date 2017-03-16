@@ -45,8 +45,6 @@ Some considerations for running node.js application using docker image
 
 ## Example
 The example covers building an image and running it on the remote server.
-The image is automatically tagged with the version from the `package.json` file as well as 'latest'.
-We use a simple shell script for picking the version from `package.json`.
 For running the image from Docker registry, we need to pull and start the container.
 Another important thing that needs to be done is create and set appropriate permissions on the logs folder
 which will be mounted on docker container.
@@ -63,6 +61,7 @@ So the steps are:
 
 ### Build Image
 A shell script is used to build the image with tags and push to the repository.
+It can also extract static assets which would be generated during build.
 
 The `.dockerignore` file can be largely similar to the `.gitignore` file but also ignore the following:
 ```
@@ -84,9 +83,6 @@ If a private registry is being used, the user must be logged into Docker.
 
 Additionally, it will clean up any images which no longer have any tags associated.
 
-If `jq`, used to parse and extract values from `json` files, is not installed,
-run `sudo apt-get update && sudo apt-get install jq`
-
 ```bash
 #!/bin/bash
 
@@ -96,9 +92,18 @@ set -e
 echo
 echo "Extracting version and name from package.json"
 
-APP_NAME=`jq -r '.name' package.json` # Or just keep the name in the script
+APP_NAME="example_app"
 REPO_URL='<PRIVATE_DOCKER_REGISTRY_URL>'
-TAG=`jq -r '.version' package.json`
+# TAG could be passed in as a parameter
+# OR
+# Read version from package.json using jq
+# TAG=`jq -r '.version' package.json` <- Not OK. Invalidates npm cache when we increment version.
+# OR
+# Keep file with docker version - not very pretty
+# TAG=$(head -n 1 .appversionrc | tr -d '\r') # Strip CRLF just in case. Screw you windows
+# OR
+# Use git commit for tagging - not user friendly
+# TAG=$(git rev-parse --short HEAD)
 
 echo
 echo "Building docker image for app '${APP_NAME}'"
@@ -113,6 +118,14 @@ echo
 echo "Tagging images with Docker repository URL"
 docker tag "$APP_NAME:$TAG" "$REPO_URL/$APP_NAME:$TAG"
 docker tag "$APP_NAME:latest" "$REPO_URL/$APP_NAME:latest"
+
+echo
+echo "Creating temporary container to copy generated assets to HOST directory"
+# Create the docker container for copying files(does not run)
+CONTAINER_ID=$(docker create "$APP_NAME:latest")
+# WORKSPACE is absolute path of the directory assigned to the build as a workspace. from JENKINS
+docker cp $CONTAINER_ID:/home/node/example-app/dist/assets/. <DESTINATION FOLDER>/cdn-assets/
+docker rm -v $CONTAINER_ID
 
 echo
 echo "Removing orphaned images"
@@ -264,7 +277,11 @@ which will be mounted on docker container. This is a one time task.
 
 ```bash
 ssh -i ssl-cert.pem \
-	dockeruser@my.docker.host '
+	dockeruser@my.docker.host << EOF
+
+set -e
+
+source ~/.profile
 
 cd ~/dist/docker/example-app
 
@@ -272,11 +289,7 @@ if docker stop example_app_container; then docker rm example_app_container; fi
 
 docker-compose pull && docker-compose up -d
 
-if docker rmi $(docker images --filter "dangling=true" -q --no-trunc); then :; fi
-
-exit
-
-'
+EOF
 ```
 
 #### `docker-compose.yml`
