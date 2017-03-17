@@ -12,6 +12,7 @@ Docker setup and notes for Linux.
   - [Docker Compose](09-docker-compose.md)
   - [Container Communication](10-container-communcation.md)
   - [Docker for Node.js](11-docker-for-node-js.md)
+  - [Scaling containers](12-scaling-containers.md)
 
 ## Benefits
   - Separation of concerns
