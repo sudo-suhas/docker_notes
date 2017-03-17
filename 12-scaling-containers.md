@@ -10,7 +10,7 @@ So we need some kind of load balancing for the multiple docker instances which d
     But this would mean that we are limited to the initial configuration and to add additional instance,
     we would have to edit the nginx config, docker-compose file(if we're using that) and start the new container.
   - Another way is to use the network container [alias](https://docs.docker.com/compose/compose-file/compose-file-v2/#aliases)
-    along with docker compose [scaling](https://docs.docker.com/compose/reference/scale/)
+    along with docker compose [scaling](https://docs.docker.com/compose/reference/scale/). <br>
     Example:
     ```yml
     version: '2.1'
